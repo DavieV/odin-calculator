@@ -5,10 +5,18 @@ body {
 }
 
 button {
-  width: 50px;
   height: 50px;
-
   font-size: 24px;
+}
+
+.clear {
+  grid-column: span 2;
+  background-color: red;
+}
+
+.delete {
+  grid-column: span 2;
+  background-color: blue;
 }
 
 .container {
@@ -38,27 +46,9 @@ button {
 }
 
 .buttons {
-  display: flex;
-  flex: 2;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-}
-
-.numbers {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
-  gap: 8px;
-}
-
-.operators {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 10px;
 }
 
 .row {

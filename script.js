@@ -1,11 +1,25 @@
-let numberButtons = document.querySelectorAll('.numbers button')
-let operatorButtons = document.querySelectorAll('.operators button')
+// --- DOM elements setup ---
+
 let screen = document.querySelector('.screen')
+let buttons = document.querySelectorAll('button')
+let numberButtons = []
+let operatorButtons = []
+
+buttons.forEach((button) => {
+  if (button.hasAttribute('data-num')) {
+    numberButtons.push(button)
+  } else if (button.hasAttribute('data-op')) {
+    operatorButtons.push(button)
+  }
+})
 
 let screenVal = ''
 let currentNum = ''
+let hasDecimal = false
 let operands = []
 let operators = []
+
+// --- Functions ---
 
 function operate(op, a, b) {
   if (a === undefined || b === undefined) {
@@ -20,6 +34,10 @@ function operate(op, a, b) {
   } else if (op === '*') {
     return a * b
   } else if (op === '÷') {
+    if (b === 0) {
+      alert("Can't divide by zero!")
+      return a
+    }
     return a / b
   }
 }
@@ -32,15 +50,16 @@ function evaluate() {
   for (let i = 1; i < operands.length; ++i) {
     result = operate(operators[i - 1], result, operands[i])
   }
+
   screenVal = result.toString()
   screen.textContent = screenVal
-  currentNum = result
+  currentNum = result.toString()
+  hasDecimal = !Number.isInteger(result)
   operands = []
   operators = []
-
-  console.log(operands)
-  console.log(operators)
 }
+
+// --- Setup event listeners ---
 
 numberButtons.forEach((button) => {
   button.addEventListener('click', () => {
@@ -52,36 +71,48 @@ numberButtons.forEach((button) => {
 
 operatorButtons.forEach((button) => {
   let operator = button.dataset.op
-
-  if (operator === 'operate') {
-    button.addEventListener('click', () => {
+  button.addEventListener('click', () => {
+    if (operator === 'operate') {
       if (currentNum === '') {
         return
       }
-      operands.push(parseInt(currentNum))
+      operands.push(Number.parseFloat(currentNum))
       currentNum = ''
-      console.log(operands)
       evaluate(operands, operators)
-    })
-  } else if (operator === 'clear') {
-    button.addEventListener('click', () => {
+    } else if (operator === 'clear') {
       screenVal = ''
       currentNum = ''
+      hasDecimal = false
       screen.textContent = screenVal
       operands = []
       operators = []
-    })
-  } else {
-    // Regular operators: +, -, *, ÷
-    button.addEventListener('click', () => {
-      operands.push(parseInt(currentNum))
+    } else if (operator === 'delete') {
+      if (currentNum !== '') {
+        currentNum = currentNum.slice(0, -1)
+      }
+      if (screenVal !== '') {
+        screenVal = screenVal.slice(0, -1)
+        screen.textContent = screenVal
+      }
+    } else if (operator === 'decimal') {
+      if (currentNum === '' || hasDecimal) {
+        return
+      }
+      currentNum += '.'
+      screenVal += '.'
+      screen.textContent = screenVal
+      hasDecimal = true
+    } else {
+      if (currentNum === '') {
+        return
+      }
+      operands.push(Number.parseFloat(currentNum))
       operators.push(operator)
 
       currentNum = ''
+      hasDecimal = false
       screenVal += operator
-
-      console.log(operators)
-      console.log(operands)
-    })
-  }
+      screen.textContent = screenVal
+    }
+  })
 })
